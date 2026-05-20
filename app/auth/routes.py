@@ -17,8 +17,41 @@ def role_required(*roles):
         return decorated_function
     return decorator
 
+@auth_bp.route('/setup', methods=['GET', 'POST'])
+def setup():
+    # Si des utilisateurs existent déjà, interdire l'accès
+    if User.query.first():
+        flash('Le compte responsable existe déjà.', 'warning')
+        return redirect(url_for('auth.login'))
+    
+    from app.auth.forms import SetupForm
+    form = SetupForm()
+    
+    if form.validate_on_submit():
+        from app import db
+        hashed_pw = bcrypt.hashpw(form.password.data.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        responsable = User(
+            nom=form.nom.data,
+            prenom=form.prenom.data,
+            email=form.email.data,
+            password_hash=hashed_pw,
+            role='responsable',
+            affectation='les_deux',
+            is_active=True
+        )
+        db.session.add(responsable)
+        db.session.commit()
+        flash('Votre compte Responsable a été créé avec succès. Connectez-vous !', 'success')
+        return redirect(url_for('auth.login'))
+    
+    return render_template('setup.html', form=form)
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    # Si aucun utilisateur n'existe, rediriger vers la page de configuration initiale
+    if not User.query.first():
+        return redirect(url_for('auth.setup'))
+    
     if current_user.is_authenticated:
         return redirect(url_for('auth.dashboard'))
     

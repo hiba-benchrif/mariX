@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mariX - Configuration Initiale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/marix.css') }}">
+</head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+    
+    <div style="width: 100%; max-width: 500px; padding: 2rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h1 style="color: white; font-size: 2.5rem; margin-bottom: 0.5rem;">mari<span style="color: var(--accent);">X</span></h1>
+            <p style="color: rgba(255,255,255,0.6);">Bienvenue ! Configurez votre compte administrateur.</p>
+        </div>
+
+        <div class="card" style="padding: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <i class="ph-fill ph-shield-star" style="color: var(--primary); font-size: 2rem;"></i>
+                <div>
+                    <h3 style="margin: 0;">Compte Responsable</h3>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Ce formulaire n'apparaît qu'une seule fois.</p>
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}" style="margin-bottom: 1rem;">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                {{ form.csrf_token }}
+                
+                <div class="grid-cols-2">
+                    <div class="form-group">
+                        {{ form.nom.label(class="form-label") }}
+                        {{ form.nom(class="form-control", placeholder="Ex: Benchrif") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.prenom.label(class="form-label") }}
+                        {{ form.prenom(class="form-control", placeholder="Ex: Hiba") }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control", type="email", placeholder="Ex: directeur@asfoex.ma") }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control", type="password", placeholder="Choisissez un mot de passe sécurisé") }}
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    {{ form.submit(class="btn btn-primary", style="width: 100%; padding: 0.75rem;") }}
+                </div>
+            </form>
+        </div>
+
+        <p style="text-align: center; margin-top: 1.5rem; color: rgba(255,255,255,0.4); font-size: 0.75rem;">
+            <i class="ph ph-lock-simple"></i> Ce formulaire se désactive automatiquement après la création du premier compte.
+        </p>
+    </div>
+</body>
+</html>
