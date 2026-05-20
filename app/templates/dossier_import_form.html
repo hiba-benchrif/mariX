@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="margin: 0;">{{ title }}</h2>
+        <a href="{{ url_for('dossiers.liste_dossiers') }}" class="btn btn-secondary">Annuler</a>
+    </div>
+
+    <form method="POST">
+        {{ form.csrf_token }}
+        
+        <h4 style="margin-top: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Parties prenantes</h4>
+        <div class="grid-cols-2">
+            <div class="form-group">{{ form.numero_dossier.label(class="form-label") }} {{ form.numero_dossier(class="form-control") }}</div>
+            <div class="form-group">{{ form.commercial.label(class="form-label") }} {{ form.commercial(class="form-control") }}</div>
+            <div class="form-group">{{ form.exploitant.label(class="form-label") }} {{ form.exploitant(class="form-control") }}</div>
+            <div class="form-group">{{ form.fournisseur.label(class="form-label") }} {{ form.fournisseur(class="form-control") }}</div>
+            <div class="form-group">{{ form.client.label(class="form-label") }} {{ form.client(class="form-control") }}</div>
+            <div class="form-group">{{ form.agent.label(class="form-label") }} {{ form.agent(class="form-control") }}</div>
+        </div>
+
+        <h4 style="margin-top: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Transport & Dates</h4>
+        <div class="grid-cols-2">
+            <div class="form-group">{{ form.compagnie.label(class="form-label") }} {{ form.compagnie(class="form-control") }}</div>
+            <div class="form-group">{{ form.mbl.label(class="form-label") }} {{ form.mbl(class="form-control") }}</div>
+            <div class="form-group">{{ form.pol.label(class="form-label") }} {{ form.pol(class="form-control") }}</div>
+            <div class="form-group">{{ form.pod.label(class="form-label") }} {{ form.pod(class="form-control") }}</div>
+            <div class="form-group">{{ form.type_conteneur.label(class="form-label") }} {{ form.type_conteneur(class="form-control") }}</div>
+            <div class="form-group">{{ form.pays.label(class="form-label") }} {{ form.pays(class="form-control") }}</div>
+            <div class="form-group">{{ form.etd.label(class="form-label") }} {{ form.etd(type="date", class="form-control") }}</div>
+            <div class="form-group">{{ form.eta.label(class="form-label") }} {{ form.eta(type="date", class="form-control") }}</div>
+            <div class="form-group" style="grid-column: span 2;">{{ form.incoterm.label(class="form-label") }} {{ form.incoterm(class="form-control") }}</div>
+        </div>
+
+        <h4 style="margin-top: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Finance & Statut</h4>
+        <div class="grid-cols-2">
+            <div class="form-group">{{ form.achat.label(class="form-label") }} {{ form.achat(step="0.01", class="form-control") }}</div>
+            <div class="form-group">{{ form.vente.label(class="form-label") }} {{ form.vente(step="0.01", class="form-control") }}</div>
+            <div class="form-group">{{ form.statut.label(class="form-label") }} {{ form.statut(class="form-control") }}</div>
+        </div>
+        <div class="form-group" style="margin-top: 1rem;">{{ form.situation.label(class="form-label") }} {{ form.situation(rows=3, class="form-control") }}</div>
+
+        <div style="margin-top: 2rem; text-align: right;">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+
+{% if dossier_id %}
+<div class="card" style="max-width: 800px; margin: 2rem auto;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <i class="ph-fill ph-chat-circle-text" style="color: var(--primary); font-size: 1.5rem;"></i>
+        <h3 style="margin: 0;">Espace de Communication</h3>
+    </div>
+    
+    <div style="background-color: var(--bg-light); border-radius: 8px; padding: 1rem; max-height: 400px; overflow-y: auto; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+        {% for c in commentaires %}
+        <div style="display: flex; flex-direction: column; {% if c.role == current_user.role %}align-items: flex-end;{% else %}align-items: flex-start;{% endif %}">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">{{ c.auteur }} ({{ c.role }}) - {{ c.date.strftime('%Y-%m-%d %H:%M') }}</span>
+            <div style="padding: 0.75rem 1rem; border-radius: 16px; max-width: 80%; {% if c.role == current_user.role %}background-color: var(--primary); color: white; border-bottom-right-radius: 4px;{% else %}background-color: white; border: 1px solid var(--border); border-bottom-left-radius: 4px;{% endif %}">
+                {{ c.texte }}
+            </div>
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-muted); margin: 2rem 0;">Aucun message pour le moment.</p>
+        {% endfor %}
+    </div>
+
+    <form action="{{ url_for('dossiers.add_comment', type=dossier_type, id=dossier_id) }}" method="POST" style="display: flex; gap: 0.5rem;">
+        <input type="text" name="texte" class="form-control" placeholder="Écrire un message..." required style="flex: 1;">
+        <button type="submit" class="btn btn-primary"><i class="ph-bold ph-paper-plane-right"></i></button>
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}

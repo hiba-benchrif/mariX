@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+    <div>
+        <h2 style="margin-bottom: 0.25rem;">Tableau de bord</h2>
+        <p style="color: var(--text-muted); margin: 0;">Affectation actuelle : <strong>{{ current_user.affectation|capitalize }}</strong></p>
+    </div>
+</div>
+
+<div class="grid-cols-4" style="margin-bottom: 2rem;">
+    <div class="stat-card accent">
+        <h3>{{ en_cours }}</h3>
+        <p>Dossiers en cours</p>
+    </div>
+    <div class="stat-card warning">
+        <h3>{{ en_attente }}</h3>
+        <p>Dossiers en attente</p>
+    </div>
+    <div class="stat-card success">
+        <h3>{{ clotures }}</h3>
+        <p>Dossiers clôturés</p>
+    </div>
+    <div class="stat-card danger">
+        <h3>{{ alertes }}</h3>
+        <p>Alertes non lues</p>
+    </div>
+</div>
+
+<div class="grid-cols-2" style="margin-bottom: 2rem;">
+    <div class="card" style="display: flex; flex-direction: column;">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i class="ph-fill ph-download-simple" style="color: var(--accent);"></i> Import</h3>
+        <p style="color: var(--text-muted); flex: 1;">Gérez l'arrivée des marchandises. Créez un nouveau dossier manuellement ou laissez l'IA extraire les données de votre BL.</p>
+        <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+            <a href="{{ url_for('dossiers.new_import') }}" class="btn btn-secondary" style="flex: 1;"><i class="ph ph-keyboard" style="margin-right: 0.5rem;"></i> Saisie manuelle</a>
+            <a href="{{ url_for('dossiers.upload_ia', type='import') }}" class="btn btn-primary" style="flex: 1;"><i class="ph ph-magic-wand" style="margin-right: 0.5rem;"></i> Analyser (IA)</a>
+        </div>
+    </div>
+    <div class="card" style="display: flex; flex-direction: column;">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i class="ph-fill ph-upload-simple" style="color: var(--accent);"></i> Export</h3>
+        <p style="color: var(--text-muted); flex: 1;">Gérez l'expédition des marchandises. Créez un nouveau dossier manuellement ou laissez l'IA pré-remplir le formulaire.</p>
+        <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+            <a href="{{ url_for('dossiers.new_export') }}" class="btn btn-secondary" style="flex: 1;"><i class="ph ph-keyboard" style="margin-right: 0.5rem;"></i> Saisie manuelle</a>
+            <a href="{{ url_for('dossiers.upload_ia', type='export') }}" class="btn btn-primary" style="flex: 1;"><i class="ph ph-magic-wand" style="margin-right: 0.5rem;"></i> Analyser (IA)</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="margin: 0;">Activité récente</h3>
+        <a href="{{ url_for('dossiers.rapport_employe') }}" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.5rem 1rem;"><i class="ph ph-file-xls" style="margin-right: 0.5rem; color: var(--success); font-size: 1rem;"></i> Exporter Excel</a>
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>N° Dossier</th>
+                    <th>Type</th>
+                    <th>Client</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in recents %}
+                <tr>
+                    <td style="font-weight: 500; color: var(--primary);">{{ item.dossier.numero_dossier }}</td>
+                    <td><span class="badge badge-secondary">{{ item.type }}</span></td>
+                    <td>{{ item.dossier.client or '-' }}</td>
+                    <td>
+                        {% if item.dossier.statut == 'En cours' %}
+                        <span class="badge badge-warning">En cours</span>
+                        {% elif item.dossier.statut == 'Clôturé' %}
+                        <span class="badge badge-success">Clôturé</span>
+                        {% else %}
+                        <span class="badge badge-secondary">{{ item.dossier.statut }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: var(--text-muted);">{{ item.date.strftime('%Y-%m-%d') }}</td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('dossiers.edit_' + item.type|lower, id=item.dossier.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;"><i class="ph ph-pencil-simple"></i></a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucun dossier récent trouvé.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

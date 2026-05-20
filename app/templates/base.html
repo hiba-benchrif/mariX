@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mariX - SaaS Intranet Maritime</title>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/marix.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">mari<span>X</span></a>
+        <div class="nav-links">
+            {% if current_user.is_authenticated %}
+                <span style="font-weight: 500; display: flex; align-items: center; gap: 0.5rem;"><i class="ph-fill ph-user-circle" style="font-size: 1.5rem; color: var(--accent);"></i> {{ current_user.prenom }} {{ current_user.nom }} <span style="opacity: 0.7; font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">{{ current_user.role|capitalize }}</span></span>
+                <a href="{{ url_for('auth.profil') }}" style="display: flex; align-items: center; gap: 0.25rem;"><i class="ph ph-user-gear"></i> Mon Profil</a>
+                <a href="{{ url_for('auth.logout') }}" style="display: flex; align-items: center; gap: 0.25rem; color: #ff8a8a;"><i class="ph ph-sign-out"></i> Déconnexion</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="main-container">
+        {% if current_user.is_authenticated %}
+        <aside class="sidebar">
+            {% if current_user.role == 'employe' %}
+                <a href="{{ url_for('auth.dashboard') }}" class="{% if request.endpoint == 'auth.dashboard' %}active{% endif %}"><i class="ph ph-squares-four" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Dashboard</a>
+                <a href="{{ url_for('dossiers.new_export') }}" class="{% if request.endpoint == 'dossiers.new_export' %}active{% endif %}"><i class="ph ph-export" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Nouv. Export</a>
+                <a href="{{ url_for('dossiers.new_import') }}" class="{% if request.endpoint == 'dossiers.new_import' %}active{% endif %}"><i class="ph ph-import" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Nouv. Import</a>
+                <a href="{{ url_for('dossiers.liste_dossiers') }}" class="{% if request.endpoint == 'dossiers.liste_dossiers' %}active{% endif %}"><i class="ph ph-files" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Tous mes dossiers</a>
+                <a href="{{ url_for('chat.index', receiver_id=0) }}" class="{% if request.endpoint and request.endpoint.startswith('chat.') %}active{% endif %}"><i class="ph ph-chat-circle-dots" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Messagerie interne</a>
+                <a href="{{ url_for('dossiers.notifications') }}" class="{% if request.endpoint == 'dossiers.notifications' %}active{% endif %}">
+                    <i class="ph ph-bell" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Notifications 
+                    {% if unread_notifications_count > 0 %}
+                    <span style="background:var(--danger); color:white; padding:2px 6px; border-radius:10px; font-size:10px; margin-left: auto;">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+            {% elif current_user.role == 'responsable' %}
+                <a href="{{ url_for('auth.dashboard') }}" class="{% if request.endpoint == 'auth.dashboard' %}active{% endif %}"><i class="ph ph-squares-four" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Dashboard</a>
+                <a href="{{ url_for('dossiers.liste_dossiers') }}" class="{% if request.endpoint == 'dossiers.liste_dossiers' %}active{% endif %}"><i class="ph ph-files" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Tous les dossiers</a>
+                <a href="{{ url_for('chat.index', receiver_id=0) }}" class="{% if request.endpoint and request.endpoint.startswith('chat.') %}active{% endif %}"><i class="ph ph-chat-circle-dots" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Messagerie interne</a>
+                <a href="{{ url_for('dossiers.notifications') }}" class="{% if request.endpoint == 'dossiers.notifications' %}active{% endif %}">
+                    <i class="ph ph-bell" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Notifications 
+                    {% if unread_notifications_count > 0 %}
+                    <span style="background:var(--danger); color:white; padding:2px 6px; border-radius:10px; font-size:10px; margin-left: auto;">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('auth.employes') }}" class="{% if request.endpoint == 'auth.employes' %}active{% endif %}"><i class="ph ph-users" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Employés</a>
+                <a href="{{ url_for('dossiers.rapport_hebdomadaire') }}"><i class="ph ph-chart-line-up" style="font-size: 1.25rem; margin-right: 0.75rem;"></i> Rapports Excel</a>
+            {% endif %}
+        </aside>
+        {% endif %}
+
+        <main class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <footer>
+        mariX © 2025 — Gestion maritime intelligente
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/marix.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+flask
+flask-login
+flask-sqlalchemy
+flask-wtf
+bcrypt
+pdfplumber
+pytesseract
+openpyxl
+google-generativeai
+cloudinary
+psycopg2-binary
+gunicorn
+python-dotenv

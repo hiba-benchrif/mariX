@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+    <div>
+        <h2 style="margin-bottom: 0.25rem;">Dashboard Responsable</h2>
+        <p style="color: var(--text-muted); margin: 0;">Vue globale de l'activité du département maritime.</p>
+    </div>
+    <a href="{{ url_for('dossiers.rapport_hebdomadaire') }}" class="btn btn-primary" style="background-color: var(--success);"><i class="ph ph-file-xls" style="margin-right: 0.5rem; font-size: 1.1rem;"></i> Générer rapport hebdo</a>
+</div>
+
+<div class="grid-cols-6" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <h3 style="color: var(--primary);">{{ total_semaine }}</h3>
+        <p>Total semaine</p>
+    </div>
+    <div class="stat-card">
+        <h3 style="color: var(--primary);">{{ total_imports }}</h3>
+        <p>Imports</p>
+    </div>
+    <div class="stat-card">
+        <h3 style="color: var(--primary);">{{ total_exports }}</h3>
+        <p>Exports</p>
+    </div>
+    <div class="stat-card danger">
+        <h3>{{ anomalies_ia }}</h3>
+        <p>Anomalies IA</p>
+    </div>
+    <div class="stat-card warning">
+        <h3>{{ en_retard }}</h3>
+        <p>En retard</p>
+    </div>
+    <div class="stat-card accent">
+        <h3>{{ employes_actifs }}</h3>
+        <p>Employés actifs</p>
+    </div>
+</div>
+
+<div class="grid-cols-2" style="margin-bottom: 2rem;">
+    <div class="card" style="display: flex; flex-direction: column;">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i class="ph-fill ph-files" style="color: var(--accent);"></i> Base de données</h3>
+        <p style="color: var(--text-muted); flex: 1;">Accédez à l'intégralité des dossiers imports et exports créés par l'équipe.</p>
+        <div style="margin-top: 1rem;">
+            <a href="{{ url_for('dossiers.liste_dossiers') }}" class="btn btn-secondary"><i class="ph ph-magnifying-glass" style="margin-right: 0.5rem;"></i> Consulter tous les dossiers</a>
+        </div>
+    </div>
+    <div class="card" style="display: flex; flex-direction: column;">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i class="ph-fill ph-users-three" style="color: var(--accent);"></i> Équipe</h3>
+        <p style="color: var(--text-muted); flex: 1;">Supervisez les employés, suivez leurs performances et gérez les affectations.</p>
+        <div style="margin-top: 1rem;">
+            <a href="{{ url_for('auth.employes') }}" class="btn btn-secondary"><i class="ph ph-eye" style="margin-right: 0.5rem;"></i> Superviser l'équipe</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 1.5rem;">Tous les dossiers récents</h3>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>N° Dossier</th>
+                    <th>Type</th>
+                    <th>Employé</th>
+                    <th>Client</th>
+                    <th>Statut</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in recents %}
+                <tr>
+                    <td style="font-weight: 500; color: var(--primary);">{{ item.dossier.numero_dossier }}</td>
+                    <td><span class="badge badge-secondary">{{ item.type }}</span></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="ph-fill ph-user-circle" style="color: var(--text-muted); font-size: 1.25rem;"></i>
+                            {{ item.employe }}
+                        </div>
+                    </td>
+                    <td>{{ item.dossier.client or '-' }}</td>
+                    <td>
+                        {% if item.dossier.statut == 'En cours' %}
+                        <span class="badge badge-warning">En cours</span>
+                        {% elif item.dossier.statut == 'Clôturé' %}
+                        <span class="badge badge-success">Clôturé</span>
+                        {% else %}
+                        <span class="badge badge-secondary">{{ item.dossier.statut }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('dossiers.edit_' + item.type|lower, id=item.dossier.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;"><i class="ph ph-eye"></i> Détails</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucun dossier trouvé.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

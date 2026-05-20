@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+    <div>
+        <h2 style="margin-bottom: 0.25rem;">Gestion des Employés</h2>
+        <p style="color: var(--text-muted); margin: 0;">Ajoutez et gérez les accès de vos collaborateurs.</p>
+    </div>
+</div>
+
+<div class="grid-cols-2">
+    <!-- Formulaire d'ajout -->
+    <div class="card" style="align-self: start;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+            <i class="ph-fill ph-user-plus" style="color: var(--accent); font-size: 1.5rem;"></i>
+            <h3 style="margin: 0;">Ajouter un Employé</h3>
+        </div>
+        
+        <form method="POST">
+            {{ form.csrf_token }}
+            <div class="grid-cols-2">
+                <div class="form-group">{{ form.nom.label(class="form-label") }} {{ form.nom(class="form-control") }}</div>
+                <div class="form-group">{{ form.prenom.label(class="form-label") }} {{ form.prenom(class="form-control") }}</div>
+            </div>
+            
+            <div class="form-group">{{ form.email.label(class="form-label") }} {{ form.email(class="form-control", type="email") }}</div>
+            
+            <div class="grid-cols-2">
+                <div class="form-group">{{ form.affectation.label(class="form-label") }} {{ form.affectation(class="form-control") }}</div>
+                <div class="form-group">{{ form.password.label(class="form-label") }} {{ form.password(class="form-control", type="password") }}</div>
+            </div>
+            
+            <div style="margin-top: 1.5rem; text-align: right;">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+
+    <!-- Liste des employés -->
+    <div class="card" style="align-self: start;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+            <i class="ph-fill ph-users" style="color: var(--success); font-size: 1.5rem;"></i>
+            <h3 style="margin: 0;">Employés Actifs</h3>
+        </div>
+        
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom & Prénom</th>
+                        <th>Email</th>
+                        <th>Département</th>
+                        <th style="text-align: right;">Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employes %}
+                    <tr>
+                        <td style="font-weight: 500; color: var(--primary);">{{ emp.prenom }} {{ emp.nom }}</td>
+                        <td style="color: var(--text-muted); font-size: 0.8rem;">{{ emp.email }}</td>
+                        <td>
+                            {% if emp.affectation == 'import' %}
+                            <span class="badge badge-secondary" style="background-color: rgba(var(--success-rgb), 0.1); color: var(--success);">Import</span>
+                            {% elif emp.affectation == 'export' %}
+                            <span class="badge badge-secondary" style="background-color: rgba(var(--accent-rgb), 0.1); color: var(--accent);">Export</span>
+                            {% else %}
+                            <span class="badge badge-secondary" style="background-color: rgba(var(--warning-rgb), 0.1); color: var(--warning);">Les deux</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            {% if emp.is_active %}
+                            <span style="color: var(--success);"><i class="ph-fill ph-check-circle"></i> Actif</span>
+                            {% else %}
+                            <span style="color: var(--danger);"><i class="ph-fill ph-x-circle"></i> Inactif</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucun employé trouvé.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

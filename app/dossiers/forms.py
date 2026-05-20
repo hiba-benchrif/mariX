@@ -1,0 +1,43 @@
+from flask_wtf import FlaskForm
+from wtforms import StringField, DateField, BooleanField, TextAreaField, SelectField, SubmitField, DecimalField
+from wtforms.validators import DataRequired, Optional
+
+class DossierExportForm(FlaskForm):
+    numero_dossier = StringField('Numéro Dossier *', validators=[DataRequired()])
+    numero_booking = StringField('Numéro Booking', validators=[Optional()])
+    commercial = StringField('Commercial', validators=[Optional()])
+    client = StringField('Client', validators=[Optional()])
+    compagnie = StringField('Compagnie (Armateur)', validators=[Optional()])
+    date_booking = DateField('Date Booking', format='%Y-%m-%d', validators=[Optional()])
+    date_chargement = DateField('Date Chargement', format='%Y-%m-%d', validators=[Optional()])
+    date_sequence = DateField('Date Séquence', format='%Y-%m-%d', validators=[Optional()])
+    etd = DateField('ETD (Départ)', format='%Y-%m-%d', validators=[Optional()])
+    pod = StringField('POD (Destination)', validators=[Optional()])
+    eta = DateField('ETA (Arrivée)', format='%Y-%m-%d', validators=[Optional()])
+    nombre_conteneurs = StringField('Nombre de conteneurs (ex: 4x40)', validators=[Optional()])
+    facturation = BooleanField('Facturation effectuée', default=False)
+    situation = TextAreaField('Situation / Commentaires', validators=[Optional()])
+    statut = SelectField('Statut', choices=[('En cours', 'En cours'), ('Clôturé', 'Clôturé'), ('Annulé', 'Annulé')], default='En cours')
+    submit = SubmitField('Enregistrer le dossier Export')
+
+class DossierImportForm(FlaskForm):
+    numero_dossier = StringField('Numéro Dossier *', validators=[DataRequired()])
+    commercial = StringField('Commercial', validators=[Optional()])
+    exploitant = StringField('Exploitant', validators=[Optional()])
+    type_conteneur = StringField('Type conteneur', validators=[Optional()])
+    fournisseur = StringField('Fournisseur', validators=[Optional()])
+    client = StringField('Client', validators=[Optional()])
+    mbl = StringField('MBL', validators=[Optional()])
+    incoterm = StringField('Incoterm', validators=[Optional()])
+    agent = StringField('Agent', validators=[Optional()])
+    compagnie = StringField('Compagnie', validators=[Optional()])
+    pol = StringField('POL (Chargement)', validators=[Optional()])
+    pod = StringField('POD (Destination)', validators=[Optional()])
+    etd = DateField('ETD (Départ)', format='%Y-%m-%d', validators=[Optional()])
+    eta = DateField('ETA (Arrivée)', format='%Y-%m-%d', validators=[Optional()])
+    achat = DecimalField('Montant Achat', places=2, validators=[Optional()])
+    vente = DecimalField('Montant Vente', places=2, validators=[Optional()])
+    pays = StringField('Pays / Origin')
+    situation = TextAreaField('Situation / Remarques')
+    statut = SelectField('Statut', choices=[('En attente', 'En attente'), ('En cours', 'En cours'), ('Clôturé', 'Clôturé')])
+    submit = SubmitField('Enregistrer le dossier Import')

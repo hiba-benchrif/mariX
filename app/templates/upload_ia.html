@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2>Importer un document (IA) - Dossier {{ type|capitalize }}</h2>
+    <p>Glissez-déposez un document (BL, Facture, PDF scanné) pour que l'IA extraie automatiquement les données et pré-remplisse le formulaire de dossier.</p>
+
+    <div class="card" style="text-align: center; padding: 3rem 1rem; border: 2px dashed var(--accent); cursor: pointer; margin-top: 2rem;" id="dropzone">
+        <h3 style="color: var(--accent);">Glissez votre fichier ici</h3>
+        <p style="color: var(--text-muted);">ou cliquez pour parcourir</p>
+        <form method="POST" action="{{ url_for('dossiers.upload_ia', type=type) }}" enctype="multipart/form-data" id="upload-form">
+            <input type="file" name="document" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg">
+            <label for="file-input" class="btn btn-secondary" style="cursor: pointer; display: inline-block;">Parcourir les fichiers</label>
+            <div style="margin-top: 1rem; display: none;" id="submit-container">
+                <p id="file-name" style="font-weight: bold;"></p>
+                <button type="submit" class="btn btn-primary" style="background-color: var(--accent);">Lancer l'analyse IA</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-input');
+    const submitContainer = document.getElementById('submit-container');
+    const fileNameDisplay = document.getElementById('file-name');
+
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            fileNameDisplay.textContent = "Fichier sélectionné : " + this.files[0].name;
+            submitContainer.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

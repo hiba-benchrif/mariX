@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; gap: 1.5rem; height: calc(100vh - 120px);">
+    
+    <!-- Colonne Contacts -->
+    <div class="card" style="width: 300px; display: flex; flex-direction: column; padding: 1rem; overflow-y: auto;">
+        <h3 style="margin-top: 0; margin-bottom: 1rem;">Discussions</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Groupe Global -->
+            <a href="{{ url_for('chat.index', receiver_id=0) }}" 
+               style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 8px; text-decoration: none; color: var(--text); {% if current_receiver_id == 0 %}background-color: rgba(var(--primary-rgb), 0.1); border-left: 3px solid var(--primary);{% else %}background-color: var(--bg-light); border-left: 3px solid transparent;{% endif %} transition: background-color 0.2s;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                    <i class="ph-fill ph-users-three"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600;">Général (Équipe)</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Tous les employés</div>
+                </div>
+            </a>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 0.5rem 0;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; margin-bottom: 0.5rem;">Messages privés</div>
+            
+            <!-- Liste des employés (DMs) -->
+            {% for contact in contacts %}
+            <a href="{{ url_for('chat.index', receiver_id=contact.id) }}" 
+               style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 8px; text-decoration: none; color: var(--text); {% if current_receiver_id == contact.id %}background-color: rgba(var(--primary-rgb), 0.1); border-left: 3px solid var(--primary);{% else %}background-color: var(--bg-light); border-left: 3px solid transparent;{% endif %} transition: background-color 0.2s;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                    <i class="ph-fill ph-user"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600;">{{ contact.prenom }} {{ contact.nom }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{ contact.role|capitalize }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Colonne Chat -->
+    <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 0;">
+        
+        <!-- En-tête du chat -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem;">
+            {% if current_receiver_id == 0 %}
+            <div style="width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                <i class="ph-fill ph-users-three"></i>
+            </div>
+            <div>
+                <h3 style="margin: 0;">Canal Général (Équipe)</h3>
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.875rem;">Discutez avec tout le monde ici</p>
+            </div>
+            {% else %}
+            <div style="width: 50px; height: 50px; border-radius: 50%; background-color: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                <i class="ph-fill ph-user"></i>
+            </div>
+            <div>
+                <h3 style="margin: 0;">{{ receiver.prenom }} {{ receiver.nom }}</h3>
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.875rem;">Messages privés chiffrés</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Historique des messages -->
+        <div id="chat-messages" style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; background-color: #f8fafc;">
+            {% for msg in messages %}
+                <div style="display: flex; flex-direction: column; {% if msg.sender_id == current_user.id %}align-items: flex-end;{% else %}align-items: flex-start;{% endif %}">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+                        {{ msg.sender_name }} • {{ msg.created_at.strftime('%H:%M') }}
+                    </span>
+                    <div style="padding: 0.75rem 1rem; border-radius: 16px; max-width: 75%; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                                {% if msg.sender_id == current_user.id %}
+                                background-color: var(--primary); color: white; border-bottom-right-radius: 4px;
+                                {% else %}
+                                background-color: white; border: 1px solid var(--border); border-bottom-left-radius: 4px;
+                                {% endif %}">
+                        {{ msg.contenu }}
+                    </div>
+                </div>
+            {% else %}
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);">
+                    <i class="ph-fill ph-chats" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Aucun message. Commencez la discussion !</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Barre de saisie -->
+        <div style="padding: 1rem; border-top: 1px solid var(--border); background-color: white; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+            <form action="{{ url_for('chat.send_message', receiver_id=current_receiver_id) }}" method="POST" style="display: flex; gap: 0.5rem;">
+                <input type="text" name="contenu" class="form-control" placeholder="Écrivez votre message..." required style="flex: 1; border-radius: 20px; padding-left: 1rem;">
+                <button type="submit" class="btn btn-primary" style="border-radius: 50%; width: 45px; height: 45px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    <i class="ph-bold ph-paper-plane-right" style="font-size: 1.25rem;"></i>
+                </button>
+            </form>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    // Faire défiler automatiquement vers le bas à l'ouverture
+    var chatBox = document.getElementById("chat-messages");
+    chatBox.scrollTop = chatBox.scrollHeight;
+    
+    // Auto-refresh très basique (toutes les 10 secondes) pour les nouveaux messages
+    // Désactivé par défaut pour éviter un rechargement brutal pendant l'écriture
+    // setTimeout(function(){
+    //    window.location.reload(1);
+    // }, 10000);
+</script>
+{% endblock %}

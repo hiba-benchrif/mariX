@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+marix.db
+instance/
+.git/
+.vscode/
+*.xlsx
