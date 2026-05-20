@@ -16,8 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Expose the port (Railway/Render typically direct traffic to exposed ports)
-EXPOSE 8080
+# Expose the port (Hugging Face Spaces requires port 7860)
+EXPOSE 7860
 
 # Run with Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:7860", "run:app"]
