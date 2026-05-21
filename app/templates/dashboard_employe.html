@@ -80,7 +80,7 @@
                     </td>
                     <td style="color: var(--text-muted);">{{ item.date.strftime('%Y-%m-%d') }}</td>
                     <td style="text-align: right;">
-                        <a href="{{ url_for('dossiers.edit_' + item.type|lower, id=item.dossier.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;"><i class="ph ph-pencil-simple"></i></a>
+                        <a href="{{ url_for('dossiers.edit_' ~ (item.type|lower), id=item.dossier.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;"><i class="ph ph-pencil-simple"></i></a>
                     </td>
                 </tr>
                 {% else %}
