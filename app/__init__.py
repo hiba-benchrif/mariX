@@ -33,6 +33,15 @@ def create_app(config_class=Config):
     # Création des tables BDD en local si elles n'existent pas
     with app.app_context():
         db.create_all()
+        # Migration auto : ajouter last_activity si la colonne n'existe pas
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("SELECT last_activity FROM users LIMIT 1"))
+        except Exception:
+            db.session.rollback()
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE users ADD COLUMN last_activity DATETIME"))
+            db.session.commit()
 
     @app.context_processor
     def inject_notifications():
