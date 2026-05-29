@@ -35,13 +35,14 @@ def create_app(config_class=Config):
         db.create_all()
         # Migration auto : ajouter last_activity si la colonne n'existe pas
         try:
-            from sqlalchemy import text
-            db.session.execute(text("SELECT last_activity FROM users LIMIT 1"))
+            from sqlalchemy import text, inspect
+            inspector = inspect(db.engine)
+            columns = [col['name'] for col in inspector.get_columns('users')]
+            if 'last_activity' not in columns:
+                db.session.execute(text("ALTER TABLE users ADD COLUMN last_activity TIMESTAMP"))
+                db.session.commit()
         except Exception:
             db.session.rollback()
-            from sqlalchemy import text
-            db.session.execute(text("ALTER TABLE users ADD COLUMN last_activity DATETIME"))
-            db.session.commit()
 
     @app.context_processor
     def inject_notifications():
