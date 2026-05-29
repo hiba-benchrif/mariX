@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.13-slim
 
 # Install system dependencies for Tesseract OCR (required by pytesseract) and psycopg2 (compilation)
 RUN apt-get update && apt-get install -y \
