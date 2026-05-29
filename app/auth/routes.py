@@ -114,7 +114,12 @@ def dashboard():
         
         anomalies_ia = 0 # À implémenter avec un flag dans les modèles si nécessaire
         en_retard = 0 
-        employes_actifs = User.query.filter_by(role='employe', is_active=True).count()
+        
+        # Employés en ligne (actifs dans les 5 dernières minutes)
+        tous_employes = User.query.filter_by(role='employe', is_active=True).all()
+        employes_en_ligne = [u for u in tous_employes if u.is_online]
+        employes_actifs = len(employes_en_ligne)
+        employes_en_ligne_noms = [f"{u.prenom} {u.nom}" for u in employes_en_ligne]
         
         recent_exports = DossierExport.query.order_by(DossierExport.created_at.desc()).limit(5).all()
         recent_imports = DossierImport.query.order_by(DossierImport.created_at.desc()).limit(5).all()
@@ -133,6 +138,7 @@ def dashboard():
         return render_template('dashboard_responsable.html',
             total_semaine=total_semaine, total_imports=total_imports, total_exports=total_exports,
             anomalies_ia=anomalies_ia, en_retard=en_retard, employes_actifs=employes_actifs,
+            employes_en_ligne_noms=employes_en_ligne_noms,
             recents=tous_recents)
     else:
         my_exports = DossierExport.query.filter_by(created_by=current_user.id).all()

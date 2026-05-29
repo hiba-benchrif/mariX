@@ -43,6 +43,14 @@ def create_app(config_class=Config):
             return dict(unread_notifications_count=count)
         return dict(unread_notifications_count=0)
 
+    @app.before_request
+    def update_last_activity():
+        from flask_login import current_user
+        from datetime import datetime
+        if current_user.is_authenticated:
+            current_user.last_activity = datetime.utcnow()
+            db.session.commit()
+
     return app
 
 @login_manager.user_loader

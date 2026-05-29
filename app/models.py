@@ -12,7 +12,16 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20)) # 'employe' ou 'responsable'
     affectation = db.Column(db.String(20)) # 'import', 'export', 'les_deux'
     is_active = db.Column(db.Boolean, default=True)
+    last_activity = db.Column(db.DateTime, default=datetime.utcnow)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @property
+    def is_online(self):
+        """Un utilisateur est considéré en ligne s'il a été actif dans les 5 dernières minutes."""
+        if not self.last_activity:
+            return False
+        from datetime import timedelta
+        return (datetime.utcnow() - self.last_activity) < timedelta(minutes=5)
 
 class DossierExport(db.Model):
     __tablename__ = 'dossiers_export'
